@@ -1,0 +1,31 @@
+import adapter from '@sveltejs/adapter-static';
+import { sveltekit } from '@sveltejs/kit/vite';
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+	plugins: [
+		tailwindcss(),
+		sveltekit({
+			compilerOptions: {
+				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
+				runes: ({ filename }) =>
+					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
+			},
+			adapter: adapter({
+				pages: 'build',
+				assets: 'build',
+				fallback: undefined,
+				precompress: false,
+				strict: true
+			}),
+			// GitHub Pages serves the site under /<repo-name>/, not at the domain root.
+			paths: {
+				base: process.env.NODE_ENV === 'production' ? '/sdk-dashboard' : ''
+			},
+			prerender: {
+				entries: ['*']
+			}
+		})
+	]
+});

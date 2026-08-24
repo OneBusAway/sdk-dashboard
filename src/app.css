@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+
+/* Toggle-driven dark mode: `dark:` utilities respond to a `.dark` class on
+   <html> (set by the inline script in app.html) instead of only the OS
+   `prefers-color-scheme` media query. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* OneBusAway brand green (#4CAF50 / #388E3C), Material Design ramp — see
+   onebusaway-android colors.xml theme_primary / theme_primary_dark. */
+@theme {
+	--color-oba-50: #e8f5e9;
+	--color-oba-100: #c8e6c9;
+	--color-oba-200: #a5d6a7;
+	--color-oba-300: #81c784;
+	--color-oba-400: #66bb6a;
+	--color-oba-500: #4caf50;
+	--color-oba-600: #43a047;
+	--color-oba-700: #388e3c;
+	--color-oba-800: #2e7d32;
+	--color-oba-900: #1b5e20;
+}
+
+html {
+	color-scheme: light;
+}
+html.dark {
+	color-scheme: dark;
+}
+
+body {
+	background-color: #ffffff;
+}
+html.dark body {
+	background-color: #0a0a0a;
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+::-webkit-scrollbar-thumb {
+	background-color: rgb(161 161 170 / 0.4);
+	border-radius: 9999px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
