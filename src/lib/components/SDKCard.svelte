@@ -28,8 +28,27 @@
 		...stagingRuns.map((/** @type {any} */ r) => ({ ...r, source: 'staging' })),
 		...productionRuns.map((/** @type {any} */ r) => ({ ...r, source: 'production' }))
 	]);
-	const failingRuns = $derived(taggedRuns.filter((r) => r.conclusion === 'failure'));
-	const isRunning = $derived(taggedRuns.some((r) => (r.conclusion ?? r.status) === 'in_progress'));
+
+	// Keep the latest result for each workflow in each environment. A historical
+	// failure should not leave the SDK in an error state after a newer run passes.
+	const currentWorkflowRuns = $derived.by(() => {
+		const latestByWorkflow = new Map();
+		const newestFirst = [...taggedRuns].sort(
+			(a, b) => new Date(b.created_at ?? b.updated_at ?? 0).getTime() - new Date(a.created_at ?? a.updated_at ?? 0).getTime()
+		);
+
+		for (const run of newestFirst) {
+			const workflow = run.workflow_id ?? run.workflow_url ?? run.name ?? 'unknown';
+			const key = `${run.source}:${workflow}`;
+			if (!latestByWorkflow.has(key)) latestByWorkflow.set(key, run);
+		}
+
+		return [...latestByWorkflow.values()];
+	});
+	const failingRuns = $derived(currentWorkflowRuns.filter((r) => r.conclusion === 'failure'));
+	const isRunning = $derived(
+		currentWorkflowRuns.some((r) => (r.conclusion ?? r.status) === 'in_progress')
+	);
 </script>
 
 <div
